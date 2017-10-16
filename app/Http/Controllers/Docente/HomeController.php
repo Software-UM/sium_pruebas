@@ -139,7 +139,7 @@ class HomeController extends Controller {
 
 		// Se registra la asistencia
 		if($tipoAsistencia == 1 || $tipoAsistencia == 2) // Se registra la asistencia si es retardo o en tiempo
-			$checkGuardado = $guardar->checkAsistencia($id_empleado, $tipoHora, $horarioActual->id_asignacion_horario, $horaActual, $tipoAsistencia, 1);
+			$checkGuardado = $guardar->checkAsistenciaDocente($id_empleado, $tipoHora, $horarioActual->id_asignacion_horario, $horaActual, $tipoAsistencia, 1, $fechaActual);
 		return $tipoAsistencia;
 	}
 

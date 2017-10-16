@@ -570,8 +570,6 @@ class Asistencias {
 	public function checkAsistencia($idEmpleado, $tipoEntrada, $idAsignacion, $horario, $estado, $tipoHorario) {
 		$check = false;
 		$hoy = date('Y-m-d');
-		//pora pruebas
-		$hoy = date('Y-m-d', strtotime('15-10-2017'));
 		$asistencia = new Asistencias();
 		$respuesta = $this->getAsistencias($idEmpleado, $idAsignacion, $tipoHorario, $hoy);
 		if (!isset($respuesta['error'])) { //No hubo excepción 
@@ -580,8 +578,7 @@ class Asistencias {
 				$asistencia->setId($respuesta[0]['id']);
 				$asistencia->setHoraLlegada($respuesta[0]['hora_llegada']);
 				$asistencia->setHoraSalida($horario);
-				//$asistencia->setIdEstado($respuesta[0]['id_estado']);
-				$asistencia->setIdEstado($estado);
+				$asistencia->setIdEstado($respuesta[0]['id_estado']);
 				$asistencia->setEstado($respuesta[0]['estado']);
 				$asistencia->setIdEmpleado($idEmpleado);
 				$asistencia->setIdAsignacionHorario($idAsignacion);
@@ -600,6 +597,59 @@ class Asistencias {
 				$asistencia->setIdEmpleado($idEmpleado);
 				$asistencia->setIdAsignacionHorario($idAsignacion);
 				$asistencia->setFecha($hoy);
+				switch ($tipoEntrada) {
+					case 1:
+						//insert hora de entrada
+						$asistencia->setHoraLlegada($horario);
+						break;
+					case 2:
+						//insert hora salida
+						$asistencia->setHoraSalida($horario);
+						break;
+				}
+				$response = $asistencia->insertAsistencia($asistencia);
+				if (isset($response['success'])){
+					$check = true;
+				}else{
+					echo $response['error'];
+					$check = false;
+				}
+			}
+		}
+
+		return $check;
+	}
+
+	public function checkAsistenciaDocente($idEmpleado, $tipoEntrada, $idAsignacion, $horario, $estado, $tipoHorario, $fechaHoy) {
+		$check = false;
+		$asistencia = new Asistencias();
+		$respuesta = $this->getAsistencias($idEmpleado, $idAsignacion, $tipoHorario, $fechaHoy);
+		if (!isset($respuesta['error'])) { //No hubo excepción 
+			if (count($respuesta)>0) {
+				// se hace el update
+				$asistencia->setId($respuesta[0]['id']);
+				$asistencia->setHoraLlegada($respuesta[0]['hora_llegada']);
+				$asistencia->setHoraSalida($horario);
+				//$asistencia->setIdEstado($respuesta[0]['id_estado']);
+				$asistencia->setIdEstado($estado);
+				$asistencia->setEstado($respuesta[0]['estado']);
+				$asistencia->setIdEmpleado($idEmpleado);
+				$asistencia->setIdAsignacionHorario($idAsignacion);
+				$asistencia->setFecha($fechaHoy);
+				$response =  $asistencia->updateAsistencia($asistencia);
+				if (isset($response['success'])){
+					$check = true;
+				}else{
+					echo $response['error'];
+					$check  =false;
+				}
+			} else {
+				// se hace el insert
+				$asistencia->setIdEstado($estado);
+				$asistencia->setEstado($tipoHorario);
+				$asistencia->setIdEmpleado($idEmpleado);
+				$asistencia->setIdAsignacionHorario($idAsignacion);
+				$asistencia->setFecha($fechaHoy);
 				switch ($tipoEntrada) {
 					case 1:
 						//insert hora de entrada
