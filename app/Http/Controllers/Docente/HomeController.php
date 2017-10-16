@@ -66,7 +66,7 @@ class HomeController extends Controller {
 				$empleados->getSingleEmpleado($idEmpleado);
 				$fechaTomada = date('Y-m-d');
 				$diaConsultar = Utilerias::getDiaDB($fechaTomada);
-				$diaConsultar = 6; //para pruebas
+				//$diaConsultar = 6; //para pruebas
 				$plantel = $empleados->getCctPlantel();
 				//Buscamos la asignacion de horario del docente
 				if($plantel == 1)
@@ -81,11 +81,11 @@ class HomeController extends Controller {
 				if (count($horarios) > 0) {
 					$hora = date("G:i:s");
 					//para realizar pruebas
-					$fechaTomada = date('Y-m-d', strtotime('15-10-2017'));
+					/*$fechaTomada = date('Y-m-d', strtotime('15-10-2017'));
 					$diaConsultar = Utilerias::getDiaDB($fechaTomada);
-					$horarioActual = date('Y-m-d G:i:s', strtotime('15-10-2017 09:15:00'));
-					$hora = date('G:i:s', strtotime('09:15:00'));
-					$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
+					$horarioActual = date('Y-m-d G:i:s', strtotime('15-10-2017 13:40:01'));
+					$hora = date('G:i:s', strtotime('13:40:01'));
+					$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);*/
 					//seccion de pruebas
 					foreach ($horarios as $horario) {
 						$valor = $this->guardarAsistenciaDocente($idEmpleado, $horario, $hora, $fechaTomada);
@@ -94,7 +94,7 @@ class HomeController extends Controller {
 						$compara2 = date('Y-m-d G:i:s', strtotime($fechaTomada . " " . $horario->hora_salida));
 						$valor = $asistencia->compararHoras($horarioActual, $compara1, $compara2, $horario, $idEmpleado, $hora);
 						*/
-						if($valor == 1 || $valor == 2 ){
+						if($valor == 1 || $valor == 2 || $valor == 4){
 							break;
 						}
 					}
@@ -138,7 +138,7 @@ class HomeController extends Controller {
 		}
 
 		// Se registra la asistencia
-		if($tipoAsistencia == 1 || $tipoAsistencia == 2) // Se registra la asistencia si es retardo o en tiempo
+		if($tipoAsistencia == 1 || $tipoAsistencia == 2 || $tipoAsistencia == 4) // Se registra la asistencia si es retardo o en tiempo
 			$checkGuardado = $guardar->checkAsistenciaDocente($id_empleado, $tipoHora, $horarioActual->id_asignacion_horario, $horaActual, $tipoAsistencia, 1, $fechaActual);
 		return $tipoAsistencia;
 	}
@@ -146,19 +146,24 @@ class HomeController extends Controller {
 	public function validaAsistencia($horaChecado, $horaES, $duracion, $tipoHora)
 	{
 		$tolerancia = (strtotime($horaChecado) - strtotime($horaES));
-		echo '<br> horaChecado:'.$horaChecado.', horaES:'.$horaES.', tolerancia='.$tolerancia.', duracion='.$duracion.', tipoHora='.$tipoHora;
+		//echo '<br> horaChecado:'.$horaChecado.', horaES:'.$horaES.', tolerancia='.$tolerancia.', duracion='.$duracion.', tipoHora='.$tipoHora;
 		
 		if($tolerancia >= -600 && $tolerancia <= 600) { //Hora entrada/salida - Asistencia
-			echo '<br>condicion 1';
+			//echo '<br>condicion 1';
 			return 2;
 		}
 		else if($tolerancia > 600 && $tolerancia <= 1200) {//Hora entrada/salida - Retardo
-			echo '<br>condicion 2';
+			//echo '<br>condicion 2';
 			return 1;
 		}
 		else if($tolerancia >= -1200 && $tolerancia <= 600 && $duracion >= 2 && $tipoHora == 2) {//Hora salida - Asistencia Clases con +2 horas 
-			echo '<br> condicion 3';
+			//echo '<br> condicion 3';
 			return 2;
+		}
+		else if($tolerancia >= 1201 && $tolerancia <= 2999) //Hora entrada/salida - Falta
+		{
+			//echo '<br> Es falta';
+			return 4;
 		}
 		return 3;
 		

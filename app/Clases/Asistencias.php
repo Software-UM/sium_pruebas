@@ -229,8 +229,8 @@ class Asistencias {
 		try {
 			$asistencia = Asistencia::where([['fecha', $fecha],
 				['id_empleado', $idEmpleado],
-				['id_asignacion_horario', $idAsignacion],
-				['estado', $tipoHorario]])->get();
+				//['estado', $tipoHorario],
+				['id_asignacion_horario', $idAsignacion]])->get();
 			return $asistencia;
 		} catch (QueryException $e) {
 			return ['error' => 'Error al obtener la asistencia: ' . $e->getMessage()];
@@ -630,8 +630,10 @@ class Asistencias {
 				$asistencia->setId($respuesta[0]['id']);
 				$asistencia->setHoraLlegada($respuesta[0]['hora_llegada']);
 				$asistencia->setHoraSalida($horario);
-				//$asistencia->setIdEstado($respuesta[0]['id_estado']);
-				$asistencia->setIdEstado($estado);
+				if($respuesta[0]['id_estado'] != 4) //Si se ha registrado falta
+					$asistencia->setIdEstado($estado);
+				else
+					$asistencia->setIdEstado($respuesta[0]['id_estado']);
 				$asistencia->setEstado($respuesta[0]['estado']);
 				$asistencia->setIdEmpleado($idEmpleado);
 				$asistencia->setIdAsignacionHorario($idAsignacion);
