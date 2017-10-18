@@ -61,12 +61,12 @@ class HomeController extends Controller {
 			$idEmpleado = Crypt::decrypt($objeto->id);
 			$salon = $objeto->salon;
 			$idEmpleado2 = $objeto->user;
-			if (intval($idEmpleado) === intval($idEmpleado2)){
+			if (intval($idEmpleado) === intval($idEmpleado2)) {
 				$empleados = new Empleados();
 				$empleados->getSingleEmpleado($idEmpleado);
 				$fechaTomada = date('Y-m-d');
 				$diaConsultar = Utilerias::getDiaDB($fechaTomada);
-				//$diaConsultar = 6; //para pruebas
+				//$diaConsultar = 1; //para pruebas
 				$plantel = $empleados->getCctPlantel();
 				//Buscamos la asignacion de horario del docente
 				if($plantel == 1)
@@ -74,19 +74,16 @@ class HomeController extends Controller {
 				else
 					$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
 				$asistencia = new Asistencias();
-				$buscaAsistencia = new Asistencias();
 				//se encontro algun horario para este docente
 				$horarioActual = date("Y-m-d G:i:s");
 				$valor = 0;
 				if (count($horarios) > 0) {
 					$hora = date("G:i:s");
-					//para realizar pruebas
-					/*$fechaTomada = date('Y-m-d', strtotime('15-10-2017'));
-					$diaConsultar = Utilerias::getDiaDB($fechaTomada);
-					$horarioActual = date('Y-m-d G:i:s', strtotime('15-10-2017 13:40:01'));
-					$hora = date('G:i:s', strtotime('13:40:01'));
-					$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);*/
-					//seccion de pruebas
+					//para realizar pruebas **************************************************
+					//$hora = date('G:i:s', strtotime('13:19:32'));
+					//$fechaTomada = date('Y-m-d', strtotime('17-10-2017'));
+					//$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
+					//seccion de pruebas    **************************************************
 					foreach ($horarios as $horario) {
 						$valor = $this->guardarAsistenciaDocente($idEmpleado, $horario, $hora, $fechaTomada);
 						/* original
@@ -101,16 +98,21 @@ class HomeController extends Controller {
 				} else {
 					$valor = 0;
 				}
-				$parametros = ['respuesta' => $valor, 'empleado' => $empleados, 'hora' => $horarioActual];
-
+				switch ($valor) {
+					case 1:
+						$respuesta = 2; break; // Sium 1-Retardo | App 2-Retardo
+					case 2:
+						$respuesta = 1; break; // Sium 2-Atiempo | App 1-Atiempo
+					default:
+						$respuesta = 3; break;
+				}
+				//$parametros = ['respuesta' => $valor, 'empleado' => $empleados, 'hora' => $horarioActual];
+				$parametros = ['respuesta' => $respuesta, 'empleado' => $empleados, 'hora' => $horarioActual];
 				return json_encode([$parametros]);
-			}else{
+			} else {
 				$parametros = ['respuesta' => 6];
-
 				return json_encode([$parametros]);
 			}
-
-
 		} else {
 			return json_encode([['response' => "NO"]]);
 		}
@@ -166,7 +168,6 @@ class HomeController extends Controller {
 			return 4;
 		}
 		return 3;
-		
 	}
 
 	/**
