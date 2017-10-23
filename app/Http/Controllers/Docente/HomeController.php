@@ -80,7 +80,7 @@ class HomeController extends Controller {
 				if (count($horarios) > 0) {
 					$hora = date("G:i:s");
 					//para realizar pruebas **************************************************
-					//$hora = date('G:i:s', strtotime('13:19:32'));
+					//$hora = date('G:i:s', strtotime('10:50:32'));
 					//$fechaTomada = date('Y-m-d', strtotime('17-10-2017'));
 					//$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
 					//seccion de pruebas    **************************************************
