@@ -229,6 +229,7 @@
                                             <option>INGENIERÍA EN CIENCIAS COMPUTACIONALES</option>
                                             <option>INGENIERÍA EN CIENCIAS COMPUTACIONALES Y TELECOMUNICACIONES</option>
                                             <option>INGENIERÍA EN CIENCIAS DE LA COMPUTACIÓN</option>
+                                            <option>LICENCIATURA EN COMERCIO Y NEGOCIOS INTERNACIONALES</option>
                                             <option>INGENIERÍA EN COMPUTACIÓN</option>
                                             <option>INGENIERÍA EN COMPUTACIÓN E INFORMÁTICA</option>
                                             <option>INGENIERÍA EN COMPUTACIÓN ESPECIALIDAD SOFTWARE DE SISTEMAS</option>
