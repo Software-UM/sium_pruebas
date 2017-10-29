@@ -102,7 +102,7 @@ class ReporteDocente {
 	 * @param $fechaInicio
 	 * @param $fechaFin
 	 */
-	public static function imprimeAdmon($fechaInicio, $fechaFin,$cct) {
+	public static function imprimeAdmon($fechaInicio, $fechaFin, $cct, $tipoAdmon) {
 		$fpdi = new \fpdi\FPDI('P', 'mm', 'A4');
 		$link = "components/pdf/admon.pdf";
 		$pageCount = $fpdi->setSourceFile($link);
@@ -111,7 +111,7 @@ class ReporteDocente {
 		$fpdi->SetTitle('Reporte Administrativo');
 		$diferencia = strtotime($fechaFin) - strtotime($fechaInicio);
 		$dias = floor($diferencia / (60 * 60 * 24));
-		$empleados = Empleados::getAdmons($cct);
+		$empleados = Empleados::getAdmons($cct, $tipoAdmon);
 		foreach ($empleados AS $empleado) {
 			$fpdi->addPage();
 			$fpdi->useTemplate($tplIdx, 0, 0);
