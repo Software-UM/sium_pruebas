@@ -34,6 +34,7 @@ class HomeController extends Controller {
 	 * @param Request $request
 	 * @return string
 	 */
+	#Recibe por POST el usuario y contraseña del docente para hacer un inicio de sesión en la APP.
 	public function loginDocenteApp(Request $request) {
 		if ($request->isJson()) {
 			$input = $request->all();
@@ -54,6 +55,7 @@ class HomeController extends Controller {
 
 	}
 
+	#Recibe por POST la cadena encriptada del QR, para registrar la asistencia del Docente.
 	public function asistenciaDocente(Request $request) {
 		if ($request->isJson()) {
 			$input = $request->all();
@@ -61,6 +63,8 @@ class HomeController extends Controller {
 			$idEmpleado = Crypt::decrypt($objeto->id);
 			$salon = $objeto->salon;
 			$idEmpleado2 = $objeto->user;
+			#Para resolver el problema de que Cancún no hace cambio de horario, debe cambiarse a true cuando en Chiapas esté con horario de verano
+			$horarioVerano = false;
 			if (intval($idEmpleado) === intval($idEmpleado2)) {
 				$empleados = new Empleados();
 				$empleados->getSingleEmpleado($idEmpleado);
@@ -71,16 +75,19 @@ class HomeController extends Controller {
 				//Buscamos la asignacion de horario del docente
 				if($plantel == 1)
 					$horarios = Horarios::getHorariClase2($empleados->getId(), $diaConsultar, $salon);
-				else
+				else 
 					$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
 				$asistencia = new Asistencias();
 				//se encontro algun horario para este docente
 				$horarioActual = date("Y-m-d G:i:s");
 				$valor = 0;
 				if (count($horarios) > 0) {
-					$hora = date("G:i:s");
+					if($plantel == 3 && $horarioVerano == false)
+						$hora = date("G:i:s", strtotime('+1 hours'));
+					else
+						$hora = date("G:i:s");
 					//para realizar pruebas **************************************************
-					//$hora = date('G:i:s', strtotime('10:50:32'));
+					//$hora = date('G:i:s', strtotime('10:40:00'));
 					//$fechaTomada = date('Y-m-d', strtotime('17-10-2017'));
 					//$horarios = Horarios::getHorariClase($empleados->getId(), $diaConsultar);
 					//seccion de pruebas    **************************************************
@@ -120,6 +127,7 @@ class HomeController extends Controller {
 		}
 	}
 
+	#Guarda la hora registrada como Entrada/Salida dependiendo de las validaciones para establecer el tipo de Asistencia
 	public function guardarAsistenciaDocente($id_empleado, $horarioActual, $horaActual, $fechaActual)
 	{
 		$buscarAsistencia = Asistencia::where([['id_asignacion_horario', $horarioActual->id_asignacion_horario], ['fecha', $fechaActual]])->first();
@@ -147,6 +155,7 @@ class HomeController extends Controller {
 		return $tipoAsistencia;
 	}
 
+	#Valida la hora de Checado y determina si está registrando a tiempo, retardo, o fuera de tiempo
 	public function validaAsistencia($horaChecado, $horaES, $duracion, $tipoHora)
 	{
 		$tolerancia = (strtotime($horaChecado) - strtotime($horaES));
@@ -169,6 +178,10 @@ class HomeController extends Controller {
 			//echo '<br> Es falta';
 			return 4;
 		}
+		else if($tolerancia >= 3000 && $tolerancia <= 5999 && $tipoHora == 1) { //Si checa entrada después de los parámetros anteriores, se registra.
+			//echo '<br> Checó tarde';
+			return 4;
+		}
 		return 3;
 	}
 
@@ -176,6 +189,7 @@ class HomeController extends Controller {
 	 * @param Request $request
 	 * @return string
 	 */
+	#Recibe por POST el usuario y contraseña del Administrativo para validar su ingreso en la APP
 	public function loginAdminApp(Request $request) {
 		if ($request->isJson()) {
 			$input = $request->all();
@@ -195,6 +209,7 @@ class HomeController extends Controller {
 		}
 
 	}
+	#Recibe por POST la cadena encriptada del QR del administrativo para registrar su hora de Entrada/Salida.
 	public function asistenciaAdmin(Request $request) {
 		if ($request->isJson()) {
 			$input = $request->all();
